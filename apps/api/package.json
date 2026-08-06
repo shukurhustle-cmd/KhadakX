@@ -2,10 +2,13 @@
   "name": "khakadx-api",
   "version": "1.0.0",
   "scripts": {
-    "build": "nest build",
-    "start": "nest start",
-    "start:prod": "node dist/main",
-    "start:dev": "nest start --watch"
+    "build": "npm run generate && npm run compile",
+    "compile": "npx tsc",
+    "start": "node dist/main.js",
+    "start:prod": "node dist/main.js",
+    "start:dev": "npx ts-node src/main.ts",
+    "generate": "npx prisma generate",
+    "migrate": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -19,13 +22,16 @@
     "passport-jwt": "^4.0.1",
     "dotenv": "^16.0.0",
     "class-validator": "^0.14.0",
-    "class-transformer": "^0.5.1"
+    "class-transformer": "^0.5.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@types/node": "^20.0.0",
     "@types/passport-jwt": "^4.0.0",
     "prisma": "^5.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
   }
 }
