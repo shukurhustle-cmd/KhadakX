@@ -13,7 +13,6 @@ export function ARViewer({ modelUrl, dishName, onClose }: ARViewerProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Placeholder for 8thWall/WebXR integration
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);

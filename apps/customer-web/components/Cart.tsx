@@ -1,8 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
-import toast from 'react-hot-toast';
 
 interface CartItem {
   id: string;
@@ -15,7 +13,6 @@ interface CartItem {
 export function Cart() {
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadCart();
@@ -33,61 +30,9 @@ export function Cart() {
     localStorage.setItem('cart', JSON.stringify(newItems));
   };
 
-  const addItem = (menuItemId: string, name: string, price: number) => {
-    const existing = items.find(item => item.menuItemId === menuItemId);
-    if (existing) {
-      const updated = items.map(item =>
-        item.menuItemId === menuItemId
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-      saveCart(updated);
-    } else {
-      saveCart([...items, { id: Date.now().toString(), menuItemId, name, price, quantity: 1 }]);
-    }
-    toast.success(`${name} added to cart!`);
-  };
-
   const removeItem = (id: string) => {
     const updated = items.filter(item => item.id !== id);
     saveCart(updated);
-    toast.success('Item removed');
-  };
-
-  const updateQuantity = (id: string, change: number) => {
-    const updated = items.map(item => {
-      if (item.id === id) {
-        const newQuantity = item.quantity + change;
-        if (newQuantity <= 0) return null;
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    }).filter(Boolean) as CartItem[];
-    saveCart(updated);
-  };
-
-  const placeOrder = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
-        {
-          tableId: '1', // Get from context
-          items: items.map(item => ({
-            menuItemId: item.menuItemId,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-        }
-      );
-      toast.success('🎉 Order placed successfully!');
-      saveCart([]);
-      setIsOpen(false);
-    } catch (error) {
-      toast.error('Failed to place order. Please try again.');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -155,19 +100,7 @@ export function Cart() {
                           <p className="text-sm text-gray-500">₹{item.price}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
-                          >
-                            -
-                          </button>
                           <span className="w-8 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
-                          >
-                            +
-                          </button>
                           <button
                             onClick={() => removeItem(item.id)}
                             className="text-red-500 hover:text-red-700 ml-2"
@@ -187,11 +120,10 @@ export function Cart() {
                   <span>₹{total}</span>
                 </div>
                 <button
-                  onClick={placeOrder}
-                  disabled={items.length === 0 || loading}
+                  disabled={items.length === 0}
                   className="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Placing Order...' : 'Place Order'}
+                  Place Order
                 </button>
               </div>
             </motion.div>
