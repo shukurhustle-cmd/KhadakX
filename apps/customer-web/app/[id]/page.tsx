@@ -7,7 +7,7 @@ export default function TablePage() {
   const params = useParams();
   const tableId = params.id;
 
-  const waLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_PHONE_ID}?text=Hi%2C%20I%27m%20at%20table%20${tableId}`;
+  const waLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_PHONE_ID || '123456789'}?text=Hi%2C%20I%27m%20at%20table%20${tableId}`;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-8">
