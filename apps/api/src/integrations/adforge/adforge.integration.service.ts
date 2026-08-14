@@ -8,8 +8,9 @@ export class AdforgeIntegrationService {
       status: 'ready',
       source: 'khadakx',
       target: 'adforge',
-      contractVersion: '1.0',
+      contractVersion: '1.1',
       outboundEventsEnabled: false,
+      contextSyncEnabled: true,
     };
   }
 
@@ -27,5 +28,17 @@ export class AdforgeIntegrationService {
       event?.businessId &&
       event?.occurredAt,
     );
+  }
+
+  buildMarketingBrief(context: AdforgeBusinessContext, objective: string) {
+    return {
+      source: 'khadakx',
+      businessId: context.businessId,
+      vertical: context.vertical,
+      businessName: context.displayName,
+      objective,
+      capabilities: context.capabilities,
+      marketing: context.marketing,
+    };
   }
 }

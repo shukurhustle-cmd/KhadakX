@@ -17,6 +17,12 @@ export class AdforgeIntegrationController {
     return { valid: Boolean(normalized.businessId && normalized.displayName), context: normalized };
   }
 
+  @Post('marketing/brief')
+  marketingBrief(@Body() body: { context: AdforgeBusinessContext; objective: string }) {
+    const brief = this.service.buildMarketingBrief(body.context, body.objective);
+    return { valid: Boolean(brief.businessId && brief.businessName && brief.objective), brief };
+  }
+
   @Post('events/validate')
   validateEvent(@Body() event: AdforgeEvent) {
     return { valid: this.service.validateEvent(event), event };
