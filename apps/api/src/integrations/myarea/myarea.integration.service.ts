@@ -8,7 +8,17 @@ export class MyareaIntegrationService {
   constructor(private readonly adforge: AdforgeIntegrationService) {}
 
   getStatus() {
-    return { status: 'ready', source: 'myarea', bridge: 'khadakx', target: 'adforge', contractVersion: '1.1', inboundNormalizationEnabled: true, outboundDeliveryEnabled: Boolean(process.env.ADFORGE_WEBHOOK_URL) };
+    const adforge = this.adforge.getStatus();
+    return {
+      status: adforge.outboundEventsEnabled ? 'ready' : 'degraded',
+      source: 'myarea',
+      bridge: 'khadakx',
+      target: 'adforge',
+      contractVersion: '1.2',
+      inboundNormalizationEnabled: true,
+      outboundDeliveryEnabled: adforge.outboundEventsEnabled,
+      adforgeDelivery: adforge.delivery,
+    };
   }
 
   vendorToBusinessContext(vendor: MyareaVendorSnapshot): AdforgeBusinessContext {
