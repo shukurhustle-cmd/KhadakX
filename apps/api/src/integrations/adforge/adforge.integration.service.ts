@@ -8,26 +8,18 @@ export class AdforgeIntegrationService {
       status: 'ready',
       source: 'khadakx',
       target: 'adforge',
-      contractVersion: '1.1',
-      outboundEventsEnabled: false,
+      contractVersion: '1.2',
+      outboundEventsEnabled: Boolean(process.env.ADFORGE_WEBHOOK_URL),
       contextSyncEnabled: true,
     };
   }
 
   buildBusinessContext(input: Omit<AdforgeBusinessContext, 'source'>): AdforgeBusinessContext {
-    return {
-      ...input,
-      source: 'khadakx',
-    };
+    return { ...input, source: 'khadakx' };
   }
 
   validateEvent(event: AdforgeEvent) {
-    return Boolean(
-      event?.eventId &&
-      event?.eventType &&
-      event?.businessId &&
-      event?.occurredAt,
-    );
+    return Boolean(event?.eventId && event?.eventType && event?.businessId && event?.occurredAt);
   }
 
   buildMarketingBrief(context: AdforgeBusinessContext, objective: string) {
