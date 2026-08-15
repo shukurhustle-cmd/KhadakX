@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { AdforgeIntegrationService } from '../adforge/adforge.integration.service';
 import { MyareaIntegrationService } from './myarea.integration.service';
 import {
   MyareaEventEnvelope,
@@ -9,7 +10,10 @@ import {
 
 @Controller('integrations/myarea')
 export class MyareaIntegrationController {
-  constructor(private readonly service: MyareaIntegrationService) {}
+  constructor(
+    private readonly service: MyareaIntegrationService,
+    private readonly adforge: AdforgeIntegrationService,
+  ) {}
 
   @Get('health')
   health() {
@@ -23,20 +27,26 @@ export class MyareaIntegrationController {
   }
 
   @Post('listing/event')
-  listingEvent(@Body() listing: MyareaListingSnapshot) {
+  async listingEvent(@Body() listing: MyareaListingSnapshot) {
     const event = this.service.listingToEvent(listing);
-    return this.service.validateMappedEvent(event);
+    const validation = this.service.validateMappedEvent(event);
+    if (!validation.valid) return validation;
+    return { ...validation, delivery: await this.adforge.deliverEvent(event) };
   }
 
   @Post('order/event')
-  orderEvent(@Body() order: MyareaOrderSnapshot) {
+  async orderEvent(@Body() order: MyareaOrderSnapshot) {
     const event = this.service.orderToEvent(order);
-    return this.service.validateMappedEvent(event);
+    const validation = this.service.validateMappedEvent(event);
+    if (!validation.valid) return validation;
+    return { ...validation, delivery: await this.adforge.deliverEvent(event) };
   }
 
   @Post('events/normalize')
-  normalizeEvent(@Body() event: MyareaEventEnvelope) {
+  async normalizeEvent(@Body() event: MyareaEventEnvelope) {
     const normalized = this.service.normalizeEvent(event);
-    return this.service.validateMappedEvent(normalized);
+    const validation = this.service.validateMappedEvent(normalized);
+    if (!validation.valid) return validation;
+    return { ...validation, delivery: await this.adforge.deliverEvent(normalized) };
   }
 }
