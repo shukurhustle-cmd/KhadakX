@@ -3,7 +3,7 @@ services:
     name: khakadx-web
     runtime: node
     rootDir: .
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter khakadx-web build
+    buildCommand: corepack enable && pnpm install && pnpm --filter khakadx-web build
     startCommand: pnpm --filter khakadx-web start
     envVars:
       - key: NODE_VERSION
