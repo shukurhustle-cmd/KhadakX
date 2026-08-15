@@ -14,6 +14,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const http = app.getHttpAdapter().getInstance();
+  http.get('/', (_req: unknown, res: any) => res.json({
+    status: 'ok',
+    service: 'khadakx-api',
+    message: 'KhadakX API is running',
+    health: '/health',
+    ready: '/ready',
+  }));
   http.get('/health', (_req: unknown, res: any) => res.json({ status: 'ok', service: 'khadakx-api' }));
   http.get('/ready', (_req: unknown, res: any) => res.json({ status: 'ready', service: 'khadakx-api' }));
 
