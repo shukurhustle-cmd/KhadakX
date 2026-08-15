@@ -1,0 +1,49 @@
+name: Import AdForge into KhadakX
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  import-adforge:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[adforge-import]')
+    steps:
+      - name: Checkout KhadakX
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout AdForge
+        uses: actions/checkout@v4
+        with:
+          repository: sslastmile-ui/adforge
+          ref: master
+          path: .adforge-source
+          fetch-depth: 1
+      - name: Import AdForge source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf apps/adforge
+          mkdir -p apps/adforge
+          rsync -a .adforge-source/ apps/adforge/ --exclude='.git/' --exclude='.next/' --exclude='node_modules/' --exclude='backend/adforge.db' --exclude='backend/.venv/' --exclude='**/__pycache__/' --exclude='**/.env*'
+          rm -rf .adforge-source
+          cat > apps/adforge/README.md <<'EOF'
+# AdForge inside KhadakX
+
+AdForge is maintained as a first-class module of the KhadakX monorepo.
+EOF
+      - name: Commit imported source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/adforge
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chore: import AdForge into KhadakX [adforge-import]"
+          git push origin main
