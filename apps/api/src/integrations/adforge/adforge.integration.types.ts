@@ -27,7 +27,10 @@ export interface AdforgeEvent {
     | 'product.updated'
     | 'campaign.requested'
     | 'lead.created'
-    | 'order.created';
+    | 'order.created'
+    | 'order.updated'
+    | 'review.created'
+    | 'ride.created';
   businessId: string;
   occurredAt: string;
   payload: Record<string, unknown>;
