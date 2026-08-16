@@ -1,4 +1,4 @@
-CREATE TABLE "User" (
+CREATE TABLE IF NOT EXISTS "User" (
   "id" TEXT NOT NULL,
   "email" TEXT NOT NULL,
   "password" TEXT NOT NULL,
@@ -10,7 +10,10 @@ CREATE TABLE "User" (
   CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "Business" (
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "phone" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" TEXT NOT NULL DEFAULT 'CUSTOMER';
+
+CREATE TABLE IF NOT EXISTS "Business" (
   "id" TEXT NOT NULL,
   "name" TEXT NOT NULL,
   "slug" TEXT NOT NULL,
@@ -28,7 +31,7 @@ CREATE TABLE "Business" (
   CONSTRAINT "Business_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "BusinessMembership" (
+CREATE TABLE IF NOT EXISTS "BusinessMembership" (
   "id" TEXT NOT NULL,
   "userId" TEXT NOT NULL,
   "businessId" TEXT NOT NULL,
@@ -38,7 +41,7 @@ CREATE TABLE "BusinessMembership" (
   CONSTRAINT "BusinessMembership_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "BusinessEntitlement" (
+CREATE TABLE IF NOT EXISTS "BusinessEntitlement" (
   "id" TEXT NOT NULL,
   "businessId" TEXT NOT NULL,
   "module" TEXT NOT NULL,
@@ -49,7 +52,7 @@ CREATE TABLE "BusinessEntitlement" (
   CONSTRAINT "BusinessEntitlement_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "BusinessBlueprint" (
+CREATE TABLE IF NOT EXISTS "BusinessBlueprint" (
   "id" TEXT NOT NULL,
   "businessId" TEXT NOT NULL,
   "source" TEXT NOT NULL DEFAULT 'KHADAKX',
@@ -61,16 +64,27 @@ CREATE TABLE "BusinessBlueprint" (
   CONSTRAINT "BusinessBlueprint_pkey" PRIMARY KEY ("id")
 );
 
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-CREATE UNIQUE INDEX "Business_slug_key" ON "Business"("slug");
-CREATE UNIQUE INDEX "BusinessMembership_userId_businessId_key" ON "BusinessMembership"("userId", "businessId");
-CREATE INDEX "BusinessMembership_userId_idx" ON "BusinessMembership"("userId");
-CREATE INDEX "BusinessMembership_businessId_idx" ON "BusinessMembership"("businessId");
-CREATE UNIQUE INDEX "BusinessEntitlement_businessId_module_key" ON "BusinessEntitlement"("businessId", "module");
-CREATE INDEX "BusinessEntitlement_businessId_idx" ON "BusinessEntitlement"("businessId");
-CREATE INDEX "BusinessBlueprint_businessId_idx" ON "BusinessBlueprint"("businessId");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "Business_slug_key" ON "Business"("slug");
+CREATE UNIQUE INDEX IF NOT EXISTS "BusinessMembership_userId_businessId_key" ON "BusinessMembership"("userId", "businessId");
+CREATE INDEX IF NOT EXISTS "BusinessMembership_userId_idx" ON "BusinessMembership"("userId");
+CREATE INDEX IF NOT EXISTS "BusinessMembership_businessId_idx" ON "BusinessMembership"("businessId");
+CREATE UNIQUE INDEX IF NOT EXISTS "BusinessEntitlement_businessId_module_key" ON "BusinessEntitlement"("businessId", "module");
+CREATE INDEX IF NOT EXISTS "BusinessEntitlement_businessId_idx" ON "BusinessEntitlement"("businessId");
+CREATE INDEX IF NOT EXISTS "BusinessBlueprint_businessId_idx" ON "BusinessBlueprint"("businessId");
 
-ALTER TABLE "BusinessMembership" ADD CONSTRAINT "BusinessMembership_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "BusinessMembership" ADD CONSTRAINT "BusinessMembership_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "BusinessEntitlement" ADD CONSTRAINT "BusinessEntitlement_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "BusinessBlueprint" ADD CONSTRAINT "BusinessBlueprint_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BusinessMembership_userId_fkey') THEN
+    ALTER TABLE "BusinessMembership" ADD CONSTRAINT "BusinessMembership_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BusinessMembership_businessId_fkey') THEN
+    ALTER TABLE "BusinessMembership" ADD CONSTRAINT "BusinessMembership_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BusinessEntitlement_businessId_fkey') THEN
+    ALTER TABLE "BusinessEntitlement" ADD CONSTRAINT "BusinessEntitlement_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BusinessBlueprint_businessId_fkey') THEN
+    ALTER TABLE "BusinessBlueprint" ADD CONSTRAINT "BusinessBlueprint_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
