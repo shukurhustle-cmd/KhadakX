@@ -8,7 +8,8 @@
     "start:prod": "node dist/main.js",
     "start:dev": "npx ts-node src/main.ts",
     "generate": "npx prisma generate",
-    "migrate": "npx prisma migrate deploy"
+    "migrate": "npx prisma migrate deploy",
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
