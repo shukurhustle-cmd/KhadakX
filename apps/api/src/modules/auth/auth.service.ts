@@ -68,7 +68,7 @@ export class AuthService {
           email,
           city: body.city,
           state: body.state,
-          memberships: { create: { userId: user.id, role: 'OWNER' } },
+          memberships: { create: { user: { connect: { id: user.id } }, role: 'OWNER' } },
           entitlements: { create: { module: product, status: 'ACTIVE' } },
         },
         include: { entitlements: true },
