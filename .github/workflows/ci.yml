@@ -1,0 +1,56 @@
+name: KhadakX CI
+
+on:
+  push:
+    branches:
+      - main
+      - feat/unified-business-identity
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    name: Build all production applications
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Activate pnpm 8
+        run: corepack prepare pnpm@8.15.9 --activate
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --dir apps/api generate
+
+      - name: Build API
+        run: pnpm --dir apps/api build
+
+      - name: Build KhadakX B2B web
+        run: pnpm --dir apps/web build
+
+      - name: Build MyArea customer web
+        run: pnpm --dir apps/customer-web build
+
+      - name: Build KhadakX admin dashboard
+        run: pnpm --dir apps/admin-dashboard build
+
+      - name: Build AdForge dashboard
+        run: pnpm --dir apps/adforge build
