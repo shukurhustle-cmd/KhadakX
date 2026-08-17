@@ -16,6 +16,10 @@
     "db:migrate": "pnpm --dir apps/api migrate",
     "db:seed": "pnpm --dir apps/api seed"
   },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
   "devDependencies": {
     "turbo": "^1.10.0",
     "typescript": "^5.0.0"
