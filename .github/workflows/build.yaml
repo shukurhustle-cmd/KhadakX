@@ -29,13 +29,8 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install pnpm from packageManager
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile --registry=https://registry.npmjs.org
+        run: npm install --workspaces --include-workspace-root --no-audit --no-fund
 
       - name: Build ${{ matrix.app }}
-        run: pnpm --filter ${{ matrix.app }} build
+        run: npm --workspace apps/${{ matrix.app }} run build
