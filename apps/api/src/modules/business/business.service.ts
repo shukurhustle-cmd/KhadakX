@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 export const PRODUCT_MODULES = ['MYAREA', 'KHADAKX', 'ADFORGE'] as const;
@@ -46,7 +47,13 @@ export class BusinessService {
     });
     const version = (latest?.version || 0) + 1;
     return this.prisma.businessBlueprint.create({
-      data: { businessId, payload, source, version, status: 'READY' },
+      data: {
+        businessId,
+        payload: payload as Prisma.InputJsonValue,
+        source,
+        version,
+        status: 'READY',
+      },
     });
   }
 }
