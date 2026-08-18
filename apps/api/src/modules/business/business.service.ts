@@ -31,6 +31,10 @@ export class BusinessService {
     return membership;
   }
 
+  async assertMemberForUser(businessId: string, userId: string) {
+    return this.assertMember(businessId, userId);
+  }
+
   async upgradeForUser(businessId: string, userId: string, module: string) {
     await this.assertMember(businessId, userId);
     return this.upgrade(businessId, module);
