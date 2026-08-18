@@ -34,3 +34,7 @@ jobs:
 
       - name: Build ${{ matrix.app }}
         run: npm --workspace apps/${{ matrix.app }} run build
+
+      - name: Run API authorization tests
+        if: matrix.app == 'api'
+        run: npm --workspace apps/api test
