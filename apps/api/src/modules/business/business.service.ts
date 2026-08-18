@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -23,6 +23,22 @@ export class BusinessService {
     });
     if (!business) throw new NotFoundException('Business not found');
     return business;
+  }
+
+  private async assertMember(businessId: string, userId: string) {
+    const membership = await this.prisma.businessMembership.findFirst({ where: { businessId, userId } });
+    if (!membership) throw new ForbiddenException('User is not a member of this business');
+    return membership;
+  }
+
+  async upgradeForUser(businessId: string, userId: string, module: string) {
+    await this.assertMember(businessId, userId);
+    return this.upgrade(businessId, module);
+  }
+
+  async saveBlueprintForUser(businessId: string, userId: string, payload: Record<string, unknown>, source = 'KHADAKX') {
+    await this.assertMember(businessId, userId);
+    return this.saveBlueprint(businessId, payload, source);
   }
 
   async upgrade(businessId: string, module: string) {
