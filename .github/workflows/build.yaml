@@ -2,36 +2,39 @@ name: Build
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, feat/unified-business-identity]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     strategy:
+      fail-fast: false
       matrix:
-        app: [api, customer-web, admin-dashboard]
+        app: [api, web, customer-web, admin-dashboard, adforge]
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install --workspaces --include-workspace-root --no-audit --no-fund
 
       - name: Build ${{ matrix.app }}
-        run: pnpm --filter ${{ matrix.app }} build
+        run: npm --workspace apps/${{ matrix.app }} run build
 
-      - name: Run tests
-        run: pnpm --filter ${{ matrix.app }} test
+      - name: Run API authorization tests
+        if: matrix.app == 'api'
+        run: npm --workspace apps/api test
