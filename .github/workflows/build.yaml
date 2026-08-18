@@ -5,6 +5,7 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,15 +16,15 @@ jobs:
         app: [api, customer-web, admin-dashboard]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8
 
@@ -35,3 +36,7 @@ jobs:
 
       - name: Run tests
         run: pnpm --filter ${{ matrix.app }} test
+
+      - name: Run API runtime E2E
+        if: matrix.app == 'api'
+        run: pnpm --filter api test -- --runInBand src/integrations/adforge/adforge.live-e2e.spec.ts
