@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { BusinessService } from './business.service';
 
 @Controller('businesses')
@@ -16,15 +16,15 @@ export class BusinessController {
   }
 
   @Post(':id/upgrade')
-  upgrade(@Param('id') id: string, @Body() body: { module: string }) {
-    return this.businesses.upgrade(id, body.module);
+  upgrade(@Param('id') id: string, @Body() body: { module: string; userId: string }) {
+    return this.businesses.upgradeForUser(id, body.userId, body.module);
   }
 
   @Post(':id/blueprint')
   saveBlueprint(
     @Param('id') id: string,
-    @Body() body: { payload: Record<string, unknown>; source?: string },
+    @Body() body: { payload: Record<string, unknown>; source?: string; userId: string },
   ) {
-    return this.businesses.saveBlueprint(id, body.payload, body.source || 'KHADAKX');
+    return this.businesses.saveBlueprintForUser(id, body.userId, body.payload, body.source || 'KHADAKX');
   }
 }
