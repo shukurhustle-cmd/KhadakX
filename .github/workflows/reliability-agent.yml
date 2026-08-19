@@ -16,15 +16,45 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           package_json_file: 'package.json'
+
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Capture runtime metadata
+        run: |
+          {
+            echo "repository=${GITHUB_REPOSITORY}"
+            echo "workflow=${GITHUB_WORKFLOW}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_attempt=${GITHUB_RUN_ATTEMPT}"
+            echo "sha=${GITHUB_SHA}"
+            echo "ref=${GITHUB_REF}"
+            echo "node=$(node --version)"
+            echo "pnpm=$(pnpm --version)"
+          } > reliability-metadata.txt
+
       - name: Run reliability agent tests
-        run: node --test apps/reliability-agent/src/*.test.js
+        run: |
+          set -o pipefail
+          node --test apps/reliability-agent/src/*.test.js 2>&1 | tee reliability-test.log
+
+      - name: Upload reliability evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliability-agent-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            reliability-metadata.txt
+            reliability-test.log
+          if-no-files-found: warn
+          retention-days: 30
