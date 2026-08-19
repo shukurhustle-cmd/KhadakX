@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   import-adforge:
@@ -38,12 +39,24 @@ jobs:
 AdForge is maintained as a first-class module of the KhadakX monorepo.
 EOF
       - name: Commit imported source
+        id: commit
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add apps/adforge
-          if git diff --cached --quiet; then exit 0; fi
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "chore: import AdForge into KhadakX [adforge-import]"
           git push origin main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Explicitly dispatch CI for bot-generated push
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run build.yaml --ref main
+          gh workflow run runtime-e2e.yml --ref main

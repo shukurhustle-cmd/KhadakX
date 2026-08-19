@@ -4,29 +4,30 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-          
+
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          
+        uses: pnpm/action-setup@v4
+
       - name: Install dependencies
         run: pnpm install
-        
+
       - name: Build all
         run: pnpm build
-        
+
       - name: Deploy to Vercel
         run: |
           pnpm --filter customer-web deploy
