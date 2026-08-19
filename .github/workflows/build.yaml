@@ -5,6 +5,7 @@ on:
     branches: [main, develop, feat/unified-business-identity]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,15 +27,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '18'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
-        run: npm install --workspaces --include-workspace-root --no-audit --no-fund
+        run: pnpm install
 
       - name: Build ${{ matrix.app }}
-        run: npm --workspace apps/${{ matrix.app }} run build
+        run: pnpm --filter ${{ matrix.app }} build
 
       - name: Run API authorization tests
         if: matrix.app == 'api'
-        run: npm --workspace apps/api test
+        run: pnpm --filter api test -- --runInBand
+
+      - name: Run API runtime E2E
+        if: matrix.app == 'api'
+        run: pnpm --filter api test -- --runInBand src/integrations/adforge/adforge.live-e2e.spec.ts
