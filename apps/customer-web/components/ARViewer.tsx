@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 
 interface ARViewerProps {
   modelUrl: string;
@@ -37,14 +36,11 @@ export function ARViewer({ modelUrl, dishName, onClose }: ARViewerProps) {
   }, [modelUrl, dishName]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+    <div
       className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -57,9 +53,9 @@ export function ARViewer({ modelUrl, dishName, onClose }: ARViewerProps) {
             ✕
           </button>
         </div>
-        
-        <div 
-          ref={sceneRef} 
+
+        <div
+          ref={sceneRef}
           className="w-full h-[400px] bg-gray-200"
         >
           {loading && (
@@ -74,6 +70,6 @@ export function ARViewer({ modelUrl, dishName, onClose }: ARViewerProps) {
           <p className="mt-1 text-xs">This is a preview. Full AR available on mobile devices.</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
