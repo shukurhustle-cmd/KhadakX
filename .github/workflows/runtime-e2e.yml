@@ -3,6 +3,8 @@ name: Runtime E2E
 on:
   push:
     branches: [main, develop]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
