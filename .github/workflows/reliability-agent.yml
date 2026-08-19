@@ -1,0 +1,30 @@
+name: Reliability Agent
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Reliability Agent Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 'package.json'
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Run reliability agent tests
+        run: node --test apps/reliability-agent/src/*.test.js
