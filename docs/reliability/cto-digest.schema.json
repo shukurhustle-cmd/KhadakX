@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KhadakX CTO Digest",
+  "type": "object",
+  "required": ["generatedAt", "systemReliabilityPercent", "activeIncidents", "agentHealth", "tatBreaches", "ctoAttentionRequired", "recommendation"],
+  "properties": {
+    "generatedAt": {"type": "string", "format": "date-time"},
+    "systemReliabilityPercent": {"type": "number", "minimum": 0, "maximum": 100},
+    "activeIncidents": {"type": "array"},
+    "agentHealth": {"type": "array"},
+    "tatBreaches": {"type": "array", "items": {"type": "string"}},
+    "ctoAttentionRequired": {"type": "boolean"},
+    "recommendation": {"type": "string"}
+  }
+}
