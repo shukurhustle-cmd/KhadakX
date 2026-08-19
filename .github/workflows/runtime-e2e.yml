@@ -1,0 +1,42 @@
+name: Runtime E2E
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-e2e-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  adforge-runtime-e2e:
+    name: AdForge Runtime E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build API
+        run: pnpm --filter api build
+
+      - name: Run AdForge runtime E2E
+        run: pnpm --filter api test -- --runInBand src/integrations/adforge/adforge.live-e2e.spec.ts
