@@ -1,5 +1,4 @@
 'use client';
-import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const stats = [
@@ -25,14 +24,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <motion.div
+          <div
             key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
             className="stat-card"
           >
             <div className="flex items-start justify-between">
@@ -43,7 +38,7 @@ export default function DashboardPage() {
               </div>
               <span className="text-3xl">{stat.icon}</span>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
