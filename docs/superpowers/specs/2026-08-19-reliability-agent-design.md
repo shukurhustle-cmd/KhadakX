@@ -10,7 +10,7 @@ GitHub Actions remains the execution and evidence layer. A dedicated Reliability
 - Monorepo uses pnpm and declares `packageManager: pnpm@8.0.0` in the root package manifest.
 - API is a NestJS application under `apps/api`.
 - Existing CI and a dedicated Runtime E2E workflow exist under `.github/workflows/`.
-- Runtime E2E currently validates real local HTTP delivery, HMAC verification, business identity continuity, and Blueprint version continuity for the AdForge integration.
+- Runtime E2E validates real local HTTP delivery, HMAC verification, business identity continuity, and Blueprint version continuity for the AdForge integration.
 
 ## Core responsibilities
 

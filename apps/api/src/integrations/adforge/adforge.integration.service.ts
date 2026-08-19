@@ -1,10 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { createHmac } from 'node:crypto';
-import { AdforgeBusinessContext, AdforgeEvent } from './adforge.integration.types';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { createHmac, randomUUID } from 'node:crypto';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AdforgeBusinessContext, AdforgeEvent, KhadakxVertical } from './adforge.integration.types';
 
 @Injectable()
 export class AdforgeIntegrationService {
   private readonly logger = new Logger(AdforgeIntegrationService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
 
   getStatus() {
     return {
@@ -38,16 +41,56 @@ export class AdforgeIntegrationService {
     };
   }
 
+  async launchFromBusiness(businessId: string, objective = 'Launch and grow the business') {
+    const business = await this.prisma.business.findUnique({
+      where: { id: businessId },
+      include: {
+        entitlements: true,
+        blueprints: { orderBy: { version: 'desc' }, take: 1 },
+      },
+    });
+
+    if (!business) throw new NotFoundException('Business not found');
+
+    const blueprint = business.blueprints[0];
+    const vertical = this.normalizeVertical(business.industry);
+    const context = this.buildBusinessContext({
+      businessId: business.id,
+      vertical,
+      displayName: business.name,
+      capabilities: business.entitlements.filter((item) => item.status === 'ACTIVE').map((item) => item.module),
+      marketing: {
+        description: business.description || undefined,
+        websiteUrl: business.website || undefined,
+        phone: business.phone || undefined,
+        city: business.city || undefined,
+        country: business.country,
+      },
+    });
+
+    const event: AdforgeEvent = {
+      eventId: randomUUID(),
+      eventType: 'campaign.requested',
+      businessId: business.id,
+      occurredAt: new Date().toISOString(),
+      payload: {
+        objective,
+        context,
+        blueprint: blueprint?.payload || {},
+        blueprintVersion: blueprint?.version || 0,
+      },
+    };
+
+    const delivery = await this.deliverEvent(event);
+    return { accepted: delivery.delivered, configured: delivery.configured, event, delivery };
+  }
+
   async deliverEvent(event: AdforgeEvent) {
-    if (!this.validateEvent(event)) {
-      throw new Error('Invalid AdForge event envelope');
-    }
+    if (!this.validateEvent(event)) throw new Error('Invalid AdForge event envelope');
 
     const url = process.env.ADFORGE_WEBHOOK_URL;
     const secret = process.env.ADFORGE_WEBHOOK_SECRET;
-    if (!url || !secret) {
-      return { delivered: false, configured: false, eventId: event.eventId };
-    }
+    if (!url || !secret) return { delivered: false, configured: false, eventId: event.eventId };
 
     const body = JSON.stringify(event);
     const signature = createHmac('sha256', secret).update(body).digest('hex');
@@ -69,10 +112,7 @@ export class AdforgeIntegrationService {
           signal: controller.signal,
         });
 
-        if (response.ok) {
-          return { delivered: true, configured: true, eventId: event.eventId, statusCode: response.status };
-        }
-
+        if (response.ok) return { delivered: true, configured: true, eventId: event.eventId, statusCode: response.status };
         lastError = `AdForge returned HTTP ${response.status}`;
         if (response.status < 500 && response.status !== 429) break;
       } catch (error) {
@@ -80,11 +120,19 @@ export class AdforgeIntegrationService {
       } finally {
         clearTimeout(timeout);
       }
-
       await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** (attempt - 1)));
     }
 
     this.logger.error(`AdForge delivery failed for ${event.eventId}: ${lastError}`);
     return { delivered: false, configured: true, eventId: event.eventId, error: lastError };
+  }
+
+  private normalizeVertical(industry?: string | null): KhadakxVertical {
+    const value = String(industry || '').toLowerCase();
+    if (value.includes('restaurant') || value.includes('food')) return 'restaurant';
+    if (value.includes('real') && value.includes('estate')) return 'real_estate';
+    if (value.includes('hospital') || value.includes('clinic') || value.includes('health')) return 'healthcare';
+    if (value.includes('service') || value.includes('agency')) return 'services';
+    return 'other';
   }
 }
