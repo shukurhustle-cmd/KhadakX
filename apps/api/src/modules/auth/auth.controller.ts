@@ -1,29 +1,36 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly auth: AuthService) {}
+
   @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    return {
-      message: 'Login successful',
-      user: { email: body.email, role: 'CUSTOMER' }
-    };
+  login(@Body() body: { email: string; password: string }) {
+    return this.auth.login(body);
   }
 
   @Post('register')
-  async register(@Body() body: any) {
-    return {
-      message: 'Registration successful',
-      user: { email: body.email }
-    };
+  register(@Body() body: {
+    email: string;
+    password: string;
+    name: string;
+    phone?: string;
+    businessName: string;
+    industry?: string;
+    city?: string;
+    state?: string;
+    product?: 'MYAREA' | 'KHADAKX' | 'ADFORGE';
+  }) {
+    return this.auth.register(body);
   }
 
   @Get('health')
-  async health() {
-    return { 
-      status: 'ok', 
+  health() {
+    return {
+      status: 'ok',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
     };
   }
 }

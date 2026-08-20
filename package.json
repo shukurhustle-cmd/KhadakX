@@ -12,9 +12,9 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "db:generate": "pnpm --filter db generate",
-    "db:migrate": "pnpm --filter db migrate",
-    "db:seed": "pnpm --filter db seed"
+    "db:generate": "pnpm --dir apps/api generate",
+    "db:migrate": "pnpm --dir apps/api migrate",
+    "db:seed": "pnpm --dir apps/api seed"
   },
   "devDependencies": {
     "turbo": "^1.10.0",
