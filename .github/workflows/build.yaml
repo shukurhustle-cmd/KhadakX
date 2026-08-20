@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main, develop, feat/unified-business-identity]
+    branches: [main, develop, feat/unified-business-identity, chore/reconcile-unified-business-identity]
   pull_request:
-    branches: [main]
+    branches: [main, chore/reconcile-unified-business-identity]
   workflow_dispatch:
 
 permissions:
