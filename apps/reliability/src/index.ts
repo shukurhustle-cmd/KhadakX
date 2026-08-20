@@ -6,3 +6,4 @@ export * from './escalation/escalation-policy';
 export * from './cto/digest';
 export * from './evidence/workflow-evidence';
 export * from './evidence/incident-builder';
+export * from './history';
