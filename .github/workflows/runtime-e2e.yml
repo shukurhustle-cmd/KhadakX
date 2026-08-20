@@ -2,9 +2,9 @@ name: Runtime E2E
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, chore/reconcile-unified-business-identity]
   pull_request:
-    branches: [main]
+    branches: [main, chore/reconcile-unified-business-identity]
   workflow_dispatch:
 
 permissions:
