@@ -1,4 +1,5 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { HealthService } from './health.service';
 
 @Controller('health')
@@ -6,17 +7,14 @@ export class HealthController {
   constructor(private readonly health: HealthService) {}
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   liveness() {
     return this.health.liveness();
   }
 
   @Get('ready')
-  @HttpCode(HttpStatus.OK)
-  async readiness() {
+  async readiness(@Res() res: Response) {
     const result = await this.health.readiness();
-    if (result.status !== 'ready') {
-      return result;
-    }
-    return result;
+    return res.status(result.status === 'ready' ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE).json(result);
   }
 }
