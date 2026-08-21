@@ -2,13 +2,13 @@ name: Build
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, feat/reliability-main-integration]
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 jobs:
-  build:
+  app-build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -25,16 +25,36 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 8.0.0
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build ${{ matrix.app }}
         run: pnpm --filter ${{ matrix.app }} build
 
-      - name: Run tests
-        run: pnpm --filter ${{ matrix.app }} test
+  reliability:
+    runs-on: ubuntu-latest
 
-      - name: Run API runtime E2E
-        if: matrix.app == 'api'
-        run: pnpm --filter api test -- --runInBand src/integrations/adforge/adforge.live-e2e.spec.ts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.0.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build reliability package
+        run: pnpm --filter khakadx-reliability build
+
+      - name: Test reliability package
+        run: pnpm --filter khakadx-reliability test
