@@ -8,3 +8,5 @@ export * from './evidence/workflow-evidence';
 export * from './evidence/incident-builder';
 export * from './history';
 export * from './control-plane';
+export * from './observability/health';
+export * from './observability/telemetry';
