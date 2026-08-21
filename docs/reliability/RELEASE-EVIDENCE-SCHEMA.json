@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KhadakX Release Evidence Record",
+  "type": "object",
+  "required": ["release_id", "commit_sha", "evidence_state", "gates"],
+  "properties": {
+    "release_id": {"type": "string", "minLength": 1},
+    "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "workflow_run_id": {"type": ["integer", "null"]},
+    "render_deploy_id": {"type": ["string", "null"]},
+    "owner": {"type": "string", "minLength": 1},
+    "tat": {"type": ["string", "null"]},
+    "escalation_level": {"type": "integer", "minimum": 0, "maximum": 2},
+    "evidence_state": {"enum": ["VERIFIED", "FAILED", "UNOBSERVABLE", "BLOCKED"]},
+    "gates": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["state"],
+        "properties": {
+          "state": {"enum": ["GREEN", "RED", "YELLOW"]},
+          "evidence": {"type": "array", "items": {"type": "string"}},
+          "verified_at": {"type": ["string", "null"]},
+          "owner": {"type": ["string", "null"]},
+          "notes": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "root_cause": {"type": ["string", "null"]},
+    "resolution": {"type": ["string", "null"]},
+    "prevention": {"type": ["string", "null"]},
+    "final_decision": {"enum": ["GO", "NO-GO", "PENDING"]}
+  },
+  "additionalProperties": false
+}
