@@ -2,7 +2,7 @@ name: Runtime E2E
 
 on:
   push:
-    branches: [main, develop, chore/reconcile-unified-business-identity]
+    branches: [main, develop, chore/reconcile-unified-business-identity, feat/health-readiness-probes]
   pull_request:
     branches: [main, chore/reconcile-unified-business-identity]
   workflow_dispatch:
