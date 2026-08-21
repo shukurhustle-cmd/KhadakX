@@ -6,91 +6,73 @@ This file is the durable handoff point if the current ChatGPT conversation is cl
 ## Project
 KhadakX — production-focused application with a dedicated Reliability/Agent CTO architecture.
 
-## Working branch
-`feat/agent-cto-reliability-platform`
+## Current working branch
+`feat/health-readiness-probes`
 
 ## Current operating rule
 Work one gate at a time. Never claim success without fresh verification evidence. Protect the green CI/E2E baseline. Do not merge or deploy while a required production gate is unverified.
 
-## Architecture already implemented
-- Reliability incident records
-- Recurrence / Failure DNA concepts
-- Permanent-fix tracking
-- Headroom/budget policy
-- Escalation policy
-- CTO digest
-- Workflow evidence normalization
-- Workflow-to-incident conversion
-- Append-only evidence-store contract
-- Reliability history repository contract
-- Historical solution memory
-- Production environment readiness contract
-- Backup/rollback runbook
-- Reliability Control Plane foundation
+## Repository-side reliability implementation status
+- Reliability incident records: implemented
+- Recurrence / Failure DNA concepts: implemented
+- Permanent-fix tracking: implemented
+- Headroom/budget policy: implemented
+- Escalation policy: implemented
+- CTO digest: implemented
+- Workflow evidence normalization: implemented
+- Workflow-to-incident conversion: implemented
+- Append-only evidence-store contract: implemented
+- Reliability history repository contract: implemented
+- Historical solution memory: implemented
+- Production environment readiness contract: implemented
+- Backup/rollback runbook: implemented
+- Reliability Control Plane foundation: implemented
+- Health/readiness probes: implemented and unit-tested
+- Observability primitives: implemented and unit-tested
+- Circuit breaker: implemented and unit-tested
+- Idempotency primitive: implemented and unit-tested
+- Control Plane freeze/resume and repeated-failure protection: implemented and unit-tested
+- TAT/escalation/recurrence/permanent-fix policy coverage: implemented and unit-tested
 
-## Reliability Control Plane
-Central safety authority for agent operations. It tracks agent health, active/critical incidents, system health state, and whether autonomous actions are permitted. It can freeze autonomous actions when critical conditions or repeated failures cross configured thresholds.
+## CI hardening
+- Build workflow now contains a dedicated `khakadx-reliability` build/test job.
+- Build workflow runs on the active `feat/health-readiness-probes` branch and protected PR path.
+- Runtime E2E runs on the active feature branch and protected PR path.
+- Existing application Build and Runtime E2E release gates remain unchanged.
 
-## Agent model
-- CI Monitor Agent
-- E2E Monitor Agent
-- Evidence Agent
-- Incident Agent
-- Failure Intelligence / Failure DNA Agent
-- Knowledge / Solution Agent
-- Root-Cause Agent
-- Headroom Agent
-- Security Agent
-- Reliability Agent
-- Escalation Agent
-- Main Agent
-- CTO Gateway / CTO reporting layer
+## Fresh verification status
+Latest source commit is being subjected to fresh Build + Runtime E2E + reliability-domain CI. Do not mark these GREEN until GitHub reports successful runs for the latest commit.
 
-Agents operate on shared infrastructure; infrastructure retains evidence independently of agent availability.
-
-## Production readiness status at last checkpoint
-- CI orchestration: GREEN
-- Build: GREEN
-- API authorization: GREEN
-- Runtime E2E: GREEN
-- Reliability evidence: GREEN
-- Reliability history: GREEN
+## Production readiness status
+- CI baseline: GREEN at last verified baseline; fresh final-branch verification pending
+- Build: GREEN at last verified baseline; fresh final-branch verification pending
+- API authorization: GREEN at last verified baseline; fresh final-branch verification pending
+- Runtime E2E: GREEN at last verified baseline; fresh final-branch verification pending
+- Reliability source gates: IMPLEMENTED; fresh CI verification pending
 - Source rollback protection: GREEN
 - Production environment contract: implemented
-- Real production database backup: PENDING actual infrastructure access
+- Real production database backup: PENDING actual Render infrastructure access
 - Real database restore test: PENDING
 - Deployment rollback test: PENDING
 - Production secrets/integration configuration: PENDING secure deployment environment
 - Production smoke test: PENDING
 - CTO final production gate: PENDING
-- Merge/deployment: BLOCKED until production infrastructure evidence is verified
+- Merge/deployment: BLOCKED until required evidence is verified
 
-## Latest Reliability Control Plane CI checkpoint
-Latest Control Plane commit at implementation time: `894b0e287f6a70f7644e7cbe841ab6ffb4a97ea3`
-Fresh workflows created for it:
-- Build #234 — queued at checkpoint
-- Runtime E2E #42 — pending at checkpoint
-
-Do not assume these are green without checking GitHub again.
-
-## Known production blocker
-AdForge production webhook URL/secret/API key must be supplied through the secure deployment environment. Do not commit production secrets to Git.
+## Production blocker
+Render is the live deployment platform, but no Render connector is available in the current ChatGPT session. Do not invent production configuration, backup, restore, rollback, or smoke-test evidence.
 
 ## Next exact actions
-1. Re-check CI for latest Control Plane commit.
-2. Fix any failure and rerun until green.
-3. Implement/verify health + readiness probes.
-4. Implement observability: structured logs, metrics, traces, correlation IDs.
-5. Add circuit breakers and graceful degradation.
-6. Add idempotency/duplicate protection for orders, payments, webhooks and retries.
-7. Add incident timeline and regression detection.
-8. Add agent performance dashboard and audit trail.
-9. Add global autonomous-action kill switch and agent loop protection.
-10. Complete Reliability Control Plane integration.
-11. Verify real infrastructure backup/restore and deployment rollback.
-12. Run production smoke tests.
-13. CTO final verification.
-14. Only then make PR ready/merge and deploy.
+1. Check fresh GitHub CI for the latest branch commit.
+2. If any source/CI failure occurs, investigate root cause and fix it before retrying.
+3. Verify Build, reliability-domain tests, API authorization and Runtime E2E are all green for the same final commit.
+4. Record fresh CI evidence on P0 issue #8.
+5. Obtain real Render access and verify production configuration.
+6. Verify real production database backup and restore.
+7. Verify deployment rollback.
+8. Run production smoke tests.
+9. Perform final CTO verification.
+10. Only then make the release PR ready/merge and deploy.
 
 ## Important safety principles
 - No invented CI results.
