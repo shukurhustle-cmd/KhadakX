@@ -5,7 +5,8 @@ export class IdempotencyStore<T> {
   async execute(key: string, operation: () => Promise<T>): Promise<T> {
     if (!key.trim()) throw new Error('idempotency key is required');
 
-    if (this.completed.has(key)) return this.completed.get(key) as T;
+    const existing = this.completed.get(key);
+    if (existing !== undefined) return existing;
 
     if (this.inProgress.has(key)) {
       throw new Error('idempotency key is already in progress');
