@@ -10,3 +10,4 @@ export * from './history';
 export * from './control-plane';
 export * from './observability/health';
 export * from './observability/telemetry';
+export * from './resilience';
