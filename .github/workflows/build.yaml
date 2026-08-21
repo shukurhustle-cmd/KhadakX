@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main, develop, feat/unified-business-identity, chore/reconcile-unified-business-identity]
+    branches: [main, develop, feat/unified-business-identity, chore/reconcile-unified-business-identity, feat/health-readiness-probes]
   pull_request:
     branches: [main, chore/reconcile-unified-business-identity]
   workflow_dispatch:
