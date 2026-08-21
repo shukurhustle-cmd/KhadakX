@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, ServiceUnavailableException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -18,7 +18,11 @@ export class HealthService implements OnModuleDestroy {
       await this.prisma.$queryRaw`SELECT 1`;
       return { status: 'ready', service: 'khadakx-api', database: 'ok' };
     } catch {
-      return { status: 'not_ready', service: 'khadakx-api', database: 'unavailable' };
+      throw new ServiceUnavailableException({
+        status: 'not_ready',
+        service: 'khadakx-api',
+        database: 'unavailable',
+      });
     }
   }
 }
