@@ -41,16 +41,18 @@
 
 ### Task 3: CI verification
 
-**Files:** `.github/workflows/build.yaml`.
+**Files:** `.github/workflows/build.yaml`, `.github/workflows/runtime-e2e.yml`.
 
-- [ ] Add a dedicated reliability-domain test job.
-- [ ] Run it on the same PR/push protection path as the application build.
-- [ ] Keep application Build and Runtime E2E unchanged as release gates.
+- [x] Add a dedicated reliability-domain build/test job.
+- [x] Run the reliability job on the active feature branch and PR protection path.
+- [x] Keep application Build and Runtime E2E unchanged as release gates.
+- [x] Run Runtime E2E on the active feature branch as well as the protected PR path.
 
 ### Task 4: Fresh verification
 
-- [ ] Trigger fresh Build and Runtime E2E for the final branch commit.
-- [ ] Verify every job is successful.
+- [ ] Fresh Build and Runtime E2E for final branch commit.
+- [ ] Fresh reliability build/test job is successful.
+- [ ] Verify every required job is successful.
 - [ ] Inspect failures before retrying; no blind retries.
 - [ ] Update the P0 issue with evidence.
 
