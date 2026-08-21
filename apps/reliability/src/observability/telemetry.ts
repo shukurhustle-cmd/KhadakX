@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 export interface TelemetryEvent {
   eventId: string;
   occurredAt: string;
@@ -27,5 +29,5 @@ export class InMemoryTelemetrySink implements TelemetrySink {
 }
 
 export function createCorrelationId(): string {
-  return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `corr-${randomUUID()}`;
 }
