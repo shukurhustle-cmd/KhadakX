@@ -4,6 +4,7 @@ import { BusinessModule } from './modules/business/business.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AdforgeIntegrationModule } from './integrations/adforge/adforge.integration.module';
 import { MyareaIntegrationModule } from './integrations/myarea/myarea.integration.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { MyareaIntegrationModule } from './integrations/myarea/myarea.integratio
     BusinessModule,
     AdforgeIntegrationModule,
     MyareaIntegrationModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

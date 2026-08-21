@@ -45,3 +45,28 @@ jobs:
       - name: Run API runtime E2E
         if: matrix.app == 'api'
         run: pnpm --filter api test -- --runInBand src/integrations/adforge/adforge.live-e2e.spec.ts
+
+  reliability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build reliability domain
+        run: pnpm --filter khakadx-reliability build
+
+      - name: Run reliability tests
+        run: pnpm --filter khakadx-reliability test -- --runInBand
