@@ -1,33 +1,40 @@
-name: Deploy
+name: Release Verification
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Render is the production deployment platform for KhadakX.
+# This workflow deliberately does NOT deploy to Vercel.
+# Production deployment remains subject to the release Control Plane and Render gates.
 
 jobs:
-  deploy:
+  verify-release:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-          
+
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8
-          
+
       - name: Install dependencies
-        run: pnpm install
-        
-      - name: Build all
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build all packages
         run: pnpm build
-        
-      - name: Deploy to Vercel
+
+      - name: Record exact release SHA
         run: |
-          pnpm --filter customer-web deploy
-          pnpm --filter admin-dashboard deploy
+          echo "RELEASE_SHA=${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "Verified release candidate: ${GITHUB_SHA}"
