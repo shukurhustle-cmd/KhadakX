@@ -18,11 +18,9 @@ async function bootstrap() {
     status: 'ok',
     service: 'khadakx-api',
     message: 'KhadakX API is running',
-    health: '/health',
-    ready: '/ready',
+    health: '/api/health',
+    ready: '/api/ready',
   }));
-  http.get('/health', (_req: unknown, res: any) => res.json({ status: 'ok', service: 'khadakx-api' }));
-  http.get('/ready', (_req: unknown, res: any) => res.json({ status: 'ready', service: 'khadakx-api' }));
 
   const port = Number(process.env.PORT || 4000);
   await app.listen(port, '0.0.0.0');
